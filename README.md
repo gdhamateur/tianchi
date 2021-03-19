@@ -1,6 +1,6 @@
 # tianchi
 训练:
-python train.py
+<p>python train.py</p>
 测试：
-from baseline import *
-predict_to_file('result.csv')
+<p>from train import *</p>
+<p>predict_to_file('result.csv')</p>
