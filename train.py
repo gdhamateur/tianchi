@@ -16,6 +16,14 @@ from random import seed
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 SEED = 2021
+
+if not os.path.exists("checkout"):
+    os.makedirs("checkout")
+    os.makedirs("checkout/warmup")
+    os.makedirs("checkout/no_warmup")
+    os.makedirs("checkout/warmup/best_model")
+    os.makedirs("checkout/no_warmup/best_model")
+
 # 加载数据集
 data = load_data(
     BaseConfig.train_path
