@@ -45,7 +45,7 @@ if __name__ == '__main__':
         valid_data = np.array(data)[valid_id]
         train_data = list(train_data)
         valid_data = list(valid_data)
-        for d in valid_data + test_data:
+        for d in test_data:
             train_data.append((d[0], d[1], -5))
         train_generator = data_generator(train_data, BaseConfig.batch_size)
         valid_generator = data_generator(valid_data, BaseConfig.batch_size)
@@ -57,8 +57,8 @@ if __name__ == '__main__':
         model = get_model(tokens, keep_tokens)
         adv_layer_names = ['Embedding-Token']
         adversarial_training(model, adv_layer_names, 0.5)
-        evaluator = Evaluator(model, valid_generator, fold_id)
-        warmup = Warmup(decay=2e-5, warmup_epochs=5)
+        evaluator = Evaluator(model, valid_generator, fold_id, True)
+        warmup = Warmup(decay=2e-5, warmup_epochs=3)
         model.fit(
             train_generator.forfit(),
             steps_per_epoch=len(train_generator),

@@ -23,7 +23,7 @@ def get_model(tokens, keep_tokens):
         model="nezha",
         keep_tokens=[0, 100, 101, 102, 103, 100, 100] + keep_tokens[:len(tokens)]
     )
-    model.compile(loss=masked_crossentropy, optimizer=Adam(3e-5))
+    model.compile(loss=masked_crossentropy, optimizer=Adam(2e-5))
     model.summary()
     return model
 
@@ -44,19 +44,26 @@ def evaluate(data, model):
 class Evaluator(keras.callbacks.Callback):
     """评估与保存
     """
-    def __init__(self, model, data, fold_num):
+    def __init__(self, model, data, fold_num, is_warmup):
         self.best_val_score = 0.
         self.data = data
         self.model = model
         self.fold_num = fold_num
+        self.is_warmup = is_warmup
 
     def on_epoch_end(self, epoch, logs=None):
         if epoch % 10 == 0:
-            self.model.save_weights('checkout/model-{}-{}.h5'.format(epoch, self.fold_num))
+            if self.is_warmup:
+                self.model.save_weights('checkout/warmup/model-{}-{}.h5'.format(epoch, self.fold_num))
+            else:
+                self.model.save_weights('checkout/no_warmup/model-{}-{}.h5'.format(epoch, self.fold_num))
         val_score = evaluate(self.data, self.model)
         if val_score > self.best_val_score:
             self.best_val_score = val_score
-            self.model.save_weights('best_model.h5')
+            if self.is_warmup:
+                self.model.save_weights('checkout/warmup/best_model/best_model_{}.h5'.format(self.fold_num))
+            else:
+                self.model.save_weights('checkout/no_warmup/best_model/best_model_{}.h5'.format(self.fold_num))
         print(
             u'val_score: %.5f, best_val_score: %.5f\n' %
             (val_score, self.best_val_score)
